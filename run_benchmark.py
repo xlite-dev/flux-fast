@@ -55,8 +55,11 @@ def main(args):
     image.save(args.output_file)
 
     if args.cache_dit_config is not None:
-        import cache_dit 
-        cache_dit.summary(pipeline)
+        try:
+            import cache_dit 
+            cache_dit.summary(pipeline)
+        except ImportError:
+            print("cache-dit not installed, please install it to see cache-dit summary")
 
     # optionally generate PyTorch Profiler trace
     # this is done after benchmarking because tracing introduces overhead
