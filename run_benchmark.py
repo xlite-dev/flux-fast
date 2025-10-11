@@ -54,6 +54,10 @@ def main(args):
     print('time mean/var:', timings, timings.mean().item(), timings.var().item())
     image.save(args.output_file)
 
+    if args.cache_dit_config is not None:
+        import cache_dit 
+        cache_dit.summary(pipeline)
+
     # optionally generate PyTorch Profiler trace
     # this is done after benchmarking because tracing introduces overhead
     if args.trace_file is not None:
