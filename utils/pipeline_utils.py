@@ -407,12 +407,11 @@ def optimize(pipeline, args):
             )
         try:
             # docs: https://github.com/vipshop/cache-dit
-            from cache_dit.cache_factory import apply_cache_on_pipe
-            from cache_dit.cache_factory import load_cache_options_from_yaml
-            cache_options = load_cache_options_from_yaml(
-                args.cache_dit_config
+            import cache_dit
+            
+            cache_dit.enable_cache(
+                pipeline, **cache_dit.load_options(args.cache_dit_config),
             )
-            apply_cache_on_pipe(pipeline, **cache_options)
         except ImportError as e:
             print(
                 "You have passed the '--cache_dit_config' flag, but we cannot "

@@ -682,34 +682,38 @@ image = pipe(prompt, num_inference_steps=4).images[0]
 You can use `cache-dit` to further speedup FLUX model, different configurations of compute blocks (F12B12, etc.) can be customized in cache-dit: DBCache. Please check [cache-dit](https://github.com/vipshop/cache-dit) for more details. For example:
 
 ```python
-# Install: pip install -U cache-dit
+# Install: pip3 install git+https://github.com/vipshop/cache-dit.git
+import cache_dit
 from diffusers import FluxPipeline
-from cache_dit.cache_factory import apply_cache_on_pipe, CacheType
 
 pipeline = FluxPipeline.from_pretrained(
     "black-forest-labs/FLUX.1-dev",
     torch_dtype=torch.bfloat16,
 ).to("cuda")
 
-# cache-dit: DBCache configs
-cache_options = {
-    "cache_type": CacheType.DBCache,
-    "warmup_steps": 0,
-    "max_cached_steps": -1,  # -1 means no limit
-    "Fn_compute_blocks": 1,  # Fn, F1, F12, etc.
-    "Bn_compute_blocks": 0,  # Bn, B0, B12, etc.
-    "residual_diff_threshold": 0.12,
-    # TaylorSeer options
-    "enable_taylorseer": True,
-    "enable_encoder_taylorseer": True,
-    # Taylorseer cache type cache be hidden_states or residual
-    "taylorseer_cache_type": "residual",
-    "taylorseer_kwargs": {
-         "n_derivatives": 2,
-    },
-}
+# Default options, F8B0, 8 warmup steps, and unlimited cached 
+# steps for good balance between performance and precision
+cache_dit.enable_cache(pipe_or_adapter)
 
-apply_cache_on_pipe(pipeline, **cache_options)
+# Or using custom options via cache configs
+from cache_dit import BasicCacheConfig, TaylorSeerCalibratorConfig
+
+cache_dit.enable_cache(
+    pipeline,
+    # Basic DBCache w/ FnBn configurations
+    cache_config=BasicCacheConfig(
+        max_warmup_steps=0,  # steps do not cache
+        max_cached_steps=-1, # -1 means no limit
+        Fn_compute_blocks=1, # Fn, F1, etc.
+        Bn_compute_blocks=0, # Bn, B0, etc.
+        residual_diff_threshold=0.12,
+    ),
+    # Then, you can use the TaylorSeer Calibrator to approximate 
+    # the values in cached steps, taylorseer_order default is 1.
+    calibrator_config=TaylorSeerCalibratorConfig(
+        taylorseer_order=1,
+    ),
+)
 ```
 
 By the way, `cache-dit` is designed to work compatibly with torch.compile. You can easily use `cache-dit` with torch.compile to further achieve a better performance. For example:
