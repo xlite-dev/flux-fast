@@ -682,7 +682,7 @@ image = pipe(prompt, num_inference_steps=4).images[0]
 You can use `cache-dit` to further speedup FLUX model, different configurations of compute blocks (F12B12, etc.) can be customized in cache-dit: DBCache. Please check [cache-dit](https://github.com/vipshop/cache-dit) for more details. For example:
 
 ```python
-# Install: pip3 install git+https://github.com/vipshop/cache-dit.git
+# Install: pip install git+https://github.com/vipshop/cache-dit.git
 import cache_dit
 from diffusers import FluxPipeline
 
