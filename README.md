@@ -701,7 +701,7 @@ from cache_dit import DBCacheConfig, TaylorSeerCalibratorConfig
 cache_dit.enable_cache(
     pipeline,
     # Basic DBCache w/ FnBn configurations
-    cache_config=BasicCacheConfig(
+    cache_config=DBCacheConfig(
         max_warmup_steps=0,  # steps do not cache
         max_cached_steps=-1, # -1 means no limit
         Fn_compute_blocks=1, # Fn, F1, etc.
