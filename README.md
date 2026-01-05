@@ -702,8 +702,9 @@ cache_dit.enable_cache(
     pipeline,
     # Basic DBCache w/ FnBn configurations
     cache_config=DBCacheConfig(
-        max_warmup_steps=0,  # steps do not cache
+        max_warmup_steps=8,  # steps do not cache
         max_cached_steps=-1, # -1 means no limit
+        max_continuous_cached_steps=2, # limit continuous cacheed steps -> 2
         Fn_compute_blocks=1, # Fn, F1, etc.
         Bn_compute_blocks=0, # Bn, B0, etc.
         residual_diff_threshold=0.12,
